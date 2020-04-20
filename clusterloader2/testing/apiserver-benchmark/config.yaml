@@ -1,0 +1,30 @@
+{{$qps := 200}}
+{{$namespaces := 1000}}
+
+name: Simple Test
+automanagedNamespaces: {{$namespaces}}
+tuningSets:
+  - name: ConstantQPS
+    qpsLoad:
+      averageQPS: {{$qps}}
+steps:
+- name: Creating ServiceAccounts
+  phases:
+    - namespaceRange:
+        min: 1
+        max: {{$namespaces}}
+      replicasPerNamespace: 1
+      tuningSet: ConstantQPS
+      objectBundle:
+        - basename: benchmark-sa
+          objectTemplatePath: sa.yaml
+    - namespaceRange:
+        min: 1
+        max: {{$namespaces}}
+      replicasPerNamespace: 1000
+      tuningSet: ConstantQPS
+      objectBundle:
+        - basename: benchmark-secret
+          objectTemplatePath: secret.yaml
+        - basename: benchmark-configmap
+          objectTemplatePath: configmap.yaml
