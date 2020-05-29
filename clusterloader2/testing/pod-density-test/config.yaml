@@ -1,4 +1,4 @@
-{{$namespaces := 2}}
+{{$namespaces := 100}}
 {{$deploymentsPerNamespace := 10}}
 {{$concurrentWorkers := 25}}
 
