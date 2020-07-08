@@ -1,0 +1,88 @@
+apiVersion: build.openshift.io/v1
+kind: Build
+metadata:
+  annotations:
+    openshift.io/build.number: "1"
+    openshift.io/build.pod-name: buildconfig1-1-build
+  labels:
+    buildconfig: buildconfig1
+    openshift.io/build-config.name: buildconfig1
+    template: buildTemplate
+  managedFields:
+  - apiVersion: build.openshift.io/v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:annotations:
+          .: {}
+          f:kubectl.kubernetes.io/last-applied-configuration: {}
+          f:openshift.io/build.number: {}
+          f:openshift.io/build.pod-name: {}
+        f:labels:
+          .: {}
+          f:buildconfig: {}
+          f:openshift.io/build-config.name: {}
+          f:template: {}
+      f:spec:
+        f:output:
+          f:to:
+            .: {}
+            f:kind: {}
+            f:name: {}
+        f:serviceAccount: {}
+        f:source:
+          f:dockerfile: {}
+          f:git:
+            .: {}
+            f:uri: {}
+          f:type: {}
+        f:strategy:
+          f:sourceStrategy:
+            .: {}
+            f:from:
+              .: {}
+              f:kind: {}
+              f:name: {}
+          f:type: {}
+      f:status:
+        f:config:
+          .: {}
+          f:kind: {}
+          f:name: {}
+        f:outputDockerImageReference: {}
+        f:phase: {}
+    manager: kubectl
+    operation: Update
+    time: "2020-06-02T19:51:12Z"
+  - apiVersion: build.openshift.io/v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:status:
+        f:completionTimestamp: {}
+        f:startTimestamp: {}
+    manager: openshift-controller-manager
+    operation: Update
+    time: "2020-06-02T19:51:12Z"
+  name: {{.Name}}
+spec:
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: imagestream1:latest
+  postCommit: {}
+  resources: {}
+  serviceAccount: builder
+  source:
+    dockerfile: |-
+      FROM openshift/hello-openshift
+      USER example
+    git:
+      uri: git://github.com/tiwillia/hello-openshift-example.git
+    type: Git
+  strategy:
+    sourceStrategy:
+      from:
+        kind: DockerImage
+        name: openshift/hello-openshift@sha256:b4385c1776fec7175b35cf5e55b21902e5ba27d8d4d4b71bfb2f7cf9d0eb7a14
+    type: Source

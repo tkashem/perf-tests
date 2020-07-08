@@ -1,11 +1,11 @@
-{{$namespaces := 100}}
-{{$deploymentsPerNamespace := 10}}
-{{$concurrentWorkers := 25}}
+{{$namespaces := 5}}
+{{$deploymentsPerNamespace := 1}}
+{{$concurrentWorkers := 1}}
 
 name: Simple Test
 automanagedNamespaces: {{$namespaces}}
 deleteStaleNamespaces: true
-deleteAutomanagedNamespaces: true
+deleteAutomanagedNamespaces: false
 tuningSets:
   - name: Sequence
     parallelismLimitedLoad:
