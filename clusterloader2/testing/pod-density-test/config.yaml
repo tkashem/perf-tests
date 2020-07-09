@@ -1,6 +1,8 @@
-{{$namespaces := 5}}
-{{$deploymentsPerNamespace := 1}}
-{{$concurrentWorkers := 1}}
+{{$namespaces := 100}}
+{{$deploymentsPerNamespace := 60}}
+{{$concurrentDeploymentWorkers := 100}}
+{{$concurrentObjectWorkers := 200}}
+{{$objects := 500}}
 
 name: Simple Test
 automanagedNamespaces: {{$namespaces}}
@@ -10,9 +12,12 @@ tuningSets:
   - name: Sequence
     parallelismLimitedLoad:
       parallelismLimit: 1
-  - name: Concurrently
+  - name: DeploymentConcurrency
     parallelismLimitedLoad:
-      parallelismLimit: {{$concurrentWorkers}}
+      parallelismLimit: {{$concurrentDeploymentWorkers}}
+  - name: ObjectConcurrency
+    parallelismLimitedLoad:
+      parallelismLimit: {{$concurrentObjectWorkers}}
 steps:
 - name: Starting measurement for waiting for pods
   measurements:
@@ -24,13 +29,13 @@ steps:
       kind: Deployment
       labelSelector: group = load
       operationTimeout: 15m
-- name: Creating Pods
+- name: Creating Deployment and Objects
   phases:
     - namespaceRange:
         min: 1
         max: {{$namespaces}}
       replicasPerNamespace: {{$deploymentsPerNamespace}}
-      tuningSet: Concurrently
+      tuningSet: DeploymentConcurrency
       objectBundle:
       - basename: small-service
         objectTemplatePath: deployment/service.yaml
@@ -44,6 +49,16 @@ steps:
           ReplicasMin: 1
           ReplicasMax: 1
           SvcName: small-service
+    - namespaceRange:
+        min: 1
+        max: {{$namespaces}}
+      replicasPerNamespace: {{$objects}}
+      tuningSet: ObjectConcurrency
+      objectBundle:
+      - basename: dummy-secret
+        objectTemplatePath: secret.yaml
+      - basename: dummy-configmap
+        objectTemplatePath: configmap.yaml
 - name: Waiting for pods to be running
   measurements:
   - Identifier: WaitForRunningDeployments
@@ -56,7 +71,7 @@ steps:
       min: 1
       max: {{$namespaces}}
     replicasPerNamespace: 0
-    tuningSet: Concurrently
+    tuningSet: DeploymentConcurrency
     objectBundle:
       - basename: small-deployment
         objectTemplatePath: deployment/configmap.yaml
@@ -66,6 +81,16 @@ steps:
         objectTemplatePath: deployment/deployment.yaml
       - basename: small-service
         objectTemplatePath: deployment/service.yaml
+  - namespaceRange:
+      min: 1
+      max: {{$namespaces}}
+    replicasPerNamespace: 0
+    tuningSet: ObjectConcurrency
+    objectBundle:
+    - basename: dummy-secret
+      objectTemplatePath: secret.yaml
+    - basename: dummy-configmap
+      objectTemplatePath: configmap.yaml
 - name: Waiting for pods to be deleted
   measurements:
   - Identifier: WaitForRunningDeployments
